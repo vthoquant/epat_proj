@@ -140,6 +140,40 @@ class utils(object):
             df_arr.append(ticker_data)
         events = pd.concat(df_arr, axis=0)
         return events
+        
+    @staticmethod
+    def create_consolidated_events_adj_ohlcv(hist_events_dict):
+        cols_to_rename = ['Open', 'High', 'Low', 'Close']
+        cols_rename = dict(zip(cols_to_rename, ['Adj {}'.format(x) for x in cols_to_rename]))
+        cols_rename['Date'] = 'TimeStamp'
+        df_arr = []
+        for ticker, he_obj in hist_events_dict.items():
+            ticker_data = he_obj.df.copy()
+            if len(ticker_data)==0:
+                continue
+            ticker_data['Ticker'] = ticker
+            ticker_data.reset_index(inplace=True)
+            adj_factors = ticker_data['Adj Close'].values/ticker_data['Close'].values
+            ticker_data[['Open', 'High', 'Low', 'Close']] = ticker_data[['Open', 'High', 'Low', 'Close']] * np.full((4, len(adj_factors)), adj_factors).T
+            ticker_data.drop(columns=['Adj Close'], inplace=True)
+            ticker_data.rename(columns=cols_rename, inplace=True)
+            df_arr.append(ticker_data)
+        events = pd.concat(df_arr, axis=0)
+        return events
+    
+    @staticmethod
+    def create_consolidated_events_generic(hist_events_dict):
+        df_arr = []
+        for ticker, he_obj in hist_events_dict.items():
+            ticker_data = he_obj.df.copy()
+            if len(ticker_data)==0:
+                continue
+            ticker_data['Ticker'] = ticker
+            ticker_data.reset_index(inplace=True)
+            ticker_data.rename(columns={'Adj Close': 'Price', 'Date': 'TimeStamp'}, inplace=True)
+            df_arr.append(ticker_data)
+        events = pd.concat(df_arr, axis=0)
+        return events
     
     @staticmethod
     def generate_bar_data(tickers, start, end, bar_method='all'):

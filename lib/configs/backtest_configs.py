@@ -23,7 +23,7 @@ MULTICLASS_DECTREE_REBAL_BT_PARAMS = {
         'use_sample_weights': False,
         'model_params': {
             'name': 'DecisionTreeClassifier', 
-            'params': {'max_depth': 10}
+            'params': {'max_depth': 10, 'random_state': 40}
         }
     }
 }

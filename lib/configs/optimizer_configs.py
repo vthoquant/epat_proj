@@ -32,7 +32,7 @@ MULTICLASS_REBAL_GLOBAL_CONFIGS_3 = {
     'predict_probab_thresh': [-1, 0.5, 0.7]
 }
 
-MULTICLASS_REBAL_PARAMS_DT = {"max_depth": [1, 2, 3, 5, 10]}
+MULTICLASS_REBAL_PARAMS_DT = {"max_depth": [1, 2, 3, 5, 10], 'random_state': [40]}
 MULTICLASS_REBAL_OPT_CONFIGS_DT = utils.params_iterator(MULTICLASS_REBAL_PARAMS_DT)
 MULTICLASS_REBAL_OPT_CONFIGS_DT_MP = {'model_params':[{'name': 'DecisionTreeClassifier', 'params': x} for x in MULTICLASS_REBAL_OPT_CONFIGS_DT]}
 MULTICLASS_REBAL_OPT_CONFIGS_DT = utils.params_iterator({**MULTICLASS_REBAL_GLOBAL_CONFIGS_2, **MULTICLASS_REBAL_OPT_CONFIGS_DT_MP})

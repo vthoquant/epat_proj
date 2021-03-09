@@ -39,19 +39,20 @@ def main(
     val_idx = int(len(all_times)*(tvt_ratio[0] + tvt_ratio[1]))
     train_times = all_times[:val_idx] #train all the way upto the validation if we've already decided which is the optimal param set
     test_times = all_times[val_idx:]
+    all_events_consolidated = utils.create_consolidated_events_adj_ohlcv(hist_events_dict)
     print("running for {}".format(params))
     try:
         strategy = getattr(importlib.import_module(full_module_path), strategy_name)(run_name, initial_capital, 0, tickers, **params)
         strategy.db_loc = db_loc if db_loc is not None else strategy.db_loc
         for np_dt in train_times:
-            events = utils.create_event_packet_adj_ohlcv(hist_events_dict, np_dt)
+            events = all_events_consolidated[all_events_consolidated['TimeStamp'] == np_dt]
             if not strategy.skip_event(events):
                 strategy.db_write_mkt(events)
         strategy.prepare_training_data()
         strategy.train_model()
         insample_scores = strategy.generate_scores(mode='insample')
         for np_dt in test_times:
-            events = utils.create_event_packet_adj_ohlcv(hist_events_dict, np_dt)
+            events = all_events_consolidated[all_events_consolidated['TimeStamp'] == np_dt]
             if not strategy.skip_event(events):
                 strategy.db_write_mkt(events)
                 strategy.update_indicators()

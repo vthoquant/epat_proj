@@ -38,12 +38,13 @@ def main(
     all_times.sort()
     test_idx = int(len(all_times)*tvt_ratio[0])
     test_times = all_times[test_idx:]
+    all_events_consolidated = utils.create_consolidated_events_generic(hist_events_dict)
     print("running for {}".format(params))
     try:
         strategy = getattr(importlib.import_module(full_module_path), strategy_name)(run_name, initial_capital, 0, tickers, **params)
         strategy.db_loc = db_loc if db_loc is not None else strategy.db_loc
         for np_dt in test_times:
-            events = utils.create_event_packet_generic(hist_events_dict, np_dt)
+            events = all_events_consolidated[all_events_consolidated['TimeStamp'] == np_dt]
             if not strategy.skip_event(events):
                 strategy.db_write_mkt(events)
                 strategy.update_indicators()
